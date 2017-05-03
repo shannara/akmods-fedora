@@ -1,6 +1,6 @@
 Name:           akmods
 Version:        0.5.6
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Automatic kmods build and install tool 
 
 License:        MIT
@@ -60,6 +60,7 @@ after they were installed.
 
 
 %prep
+%setup -q -c -T
 cp -p %{SOURCE9} %{SOURCE10} .
 
 
@@ -131,6 +132,11 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 
 
 %changelog
+* Wed May  3 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-6
+- Run "udevadm trigger" and "systemctl restart systemd-modules-load.service"
+  when new kmod packages have been build and installed so that the new
+  modules may be used immediately without requiring a reboot
+
 * Mon Mar  6 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-5
 - Add LICENSE file (rhbz#1422918)
 
