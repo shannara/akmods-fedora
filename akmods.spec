@@ -1,6 +1,6 @@
 Name:           akmods
 Version:        0.5.6
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Automatic kmods build and install tool 
 
 License:        MIT
@@ -132,6 +132,12 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 
 
 %changelog
+* Thu May  4 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-7
+- "udevadm trigger" may have bad side-effects (rhbz#454407) instead
+  look for modalias files under /sys/devices and call modprobe directly
+- Fix exit status when no akmod packages are installed, so that systemd
+  does not consider the akmods.service as having failed to start
+
 * Wed May  3 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-6
 - Run "udevadm trigger" and "systemctl restart systemd-modules-load.service"
   when new kmod packages have been build and installed so that the new

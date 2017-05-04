@@ -178,7 +178,7 @@ init ()
 	# if there are no akmod packages installed there is nothing to do for us
 	if ! ls /usr/src/akmods/*-kmod.latest &> /dev/null ; then
 		echo -n "No akmod packages found, nothing to do." >&2
-		echo_success; echo; exit 1
+		echo_success; echo; exit 0
 	fi
 
 
@@ -423,9 +423,8 @@ check_kmods()
 
 	# akmods for newly installed akmod rpms as wells as akmods.service run
 	# after udev and systemd-modules-load.service have tried to load modules
-	# trigger/restart both so that they may load the newly installed modules
 	if [[ "${somesucceeded}" ]] && [ ${this_kernelver} = "$(uname -r)" ]; then
-		udevadm trigger
+		find /sys/devices -name modalias -print0 | xargs -0 cat | xargs modprobe -a -b -q
 		systemctl restart systemd-modules-load.service
 	fi
 }
