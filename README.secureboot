@@ -1,0 +1,31 @@
+Secure boot is a setup using UEFI firmware to check cryptographic signatures
+on the bootloader and associated OS kernel to ensure they have not been
+tampered with or bypassed in the boot process.
+
+This verification can be extended of Kernel and its modules.
+It's default case in Fedora with UEFI and Secure Boot enable.
+
+Fedora Project have signed kernel and also main modules with Fedora Key,
+but 3rd party modules as NVIDIA, VirtualBox, etc.. need signed to load.
+
+Akmods provide enroll process to sign third modules with own keypair.
+
+You can also create own certificate and keypair with `akmods-genca` command.
+Before execute `akmods-genca`:
+- we suggest to tweak /etc/akmods/cacert.config with your own information
+for certificate.
+- set SIGNMOD to "enabled" in /etc/akmods/sign-keypair.conf
+
+Now you need to enroll this key in MOK, this process describe below.
+- Ask MOK to enroll new keypair with certificate with
+`mokutil --import /etc/akmods/keys/$keyname.der`
+- MOK ask to generate password for enroll key.
+- Reboot system needed for MOK import new enroll key.
+- On next boot MOK Management was launched, you need to choose "Enroll MOK"
+- Choose "Continue" to enroll Key or "View key 0" to show key was enrolled
+- Confirm enrollment with select "Yes"
+- You will be invited for enter password "WARN keyboard is mapped as QWERTY !!"
+- The new key is enrolled, and system ask to reboot
+
+You can confirm enrollment of key with execute :
+ `mokutil --list-enrolled |grep Issuer`

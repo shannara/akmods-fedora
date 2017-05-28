@@ -1,7 +1,7 @@
 Name:           akmods
-Version:        0.5.6
-Release:        7%{?dist}
-Summary:        Automatic kmods build and install tool 
+Version:        0.5.7
+Release:        1%{?dist}
+Summary:        Automatic kmods build and install tool
 
 License:        MIT
 URL:            http://rpmfusion.org/Packaging/KernelModules/Akmods
@@ -18,6 +18,10 @@ Source7:        akmods-shutdown
 Source8:        akmods-shutdown.service
 Source9:        README
 Source10:       LICENSE
+Source11:       README.secureboot
+Source12:       cacert.config
+Source13:       akmods-genca
+Source14:       sign-keypair.conf
 
 BuildArch:      noarch
 
@@ -54,14 +58,14 @@ Requires(postun): systemd
 
 
 %description
-Akmods startup script will rebuild akmod packages during system 
+Akmods startup script will rebuild akmod packages during system
 boot while its background daemon will build them for kernels right
 after they were installed.
 
 
 %prep
 %setup -q -c -T
-cp -p %{SOURCE9} %{SOURCE10} .
+cp -p %{SOURCE9} %{SOURCE10} %{SOURCE11} .
 
 
 %build
@@ -71,6 +75,7 @@ cp -p %{SOURCE9} %{SOURCE10} .
 %install
 mkdir -p %{buildroot}%{_usrsrc}/akmods \
          %{buildroot}%{_sbindir} \
+         %{buildroot}%{_sysconfdir}/akmods/keys \
          %{buildroot}%{_sysconfdir}/kernel/postinst.d \
          %{buildroot}%{_unitdir} \
          %{buildroot}%{_localstatedir}/cache/akmods \
@@ -78,7 +83,10 @@ mkdir -p %{buildroot}%{_usrsrc}/akmods \
 install -pm 0755 %{SOURCE1} %{buildroot}%{_sbindir}/
 install -pm 0755 %{SOURCE2} %{buildroot}%{_sbindir}/
 install -pm 0755 %{SOURCE7} %{buildroot}%{_sbindir}/
+install -pm 0750 %{SOURCE13} %{buildroot}%{_sbindir}/
 install -pm 0755 %{SOURCE5} %{buildroot}%{_sysconfdir}/kernel/postinst.d/
+install -pm 0640 %{SOURCE12} %{buildroot}%{_sysconfdir}/akmods/
+install -pm 0640 %{SOURCE14} %{buildroot}%{_sysconfdir}/akmods/
 install -pm 0644 %{SOURCE8} %{buildroot}%{_unitdir}/
 
 sed "s|@SERVICE@|display-manager.service|" %{SOURCE6} >\
@@ -117,11 +125,14 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 
 
 %files
-%doc README
+%doc README README.secureboot
 %license LICENSE
 %{_sbindir}/akmodsbuild
 %{_sbindir}/akmods-shutdown
 %{_sbindir}/akmods
+%{_sbindir}/akmods-genca
+%attr(-,root,akmods) %{_sysconfdir}/akmods
+%attr(750,root,akmods) %{_sysconfdir}/akmods/keys
 %{_sysconfdir}/kernel/postinst.d/akmodsposttrans
 %{_unitdir}/akmods.service
 %{_unitdir}/akmods-shutdown.service
@@ -132,6 +143,9 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 
 
 %changelog
+* Wed May 24 2017 Stanislas Leduc <stanislas.leduc@balinor.net> - 0.5.7-1
+- Add local akmods CA signing key for sign modules to work with Secure Boot.
+
 * Thu May  4 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-7
 - "udevadm trigger" may have bad side-effects (rhbz#454407) instead
   look for modalias files under /sys/devices and call modprobe directly
