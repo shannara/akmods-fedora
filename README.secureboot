@@ -18,7 +18,7 @@ for certificate.
 
 Now you need to enroll this key in MOK, this process describe below.
 - Ask MOK to enroll new keypair with certificate with
-`mokutil --import /etc/akmods/keys/$keyname.der`
+`mokutil --import /etc/akmods/keys/public_key.der`
 - MOK ask to generate password for enroll key.
 - Reboot system needed for MOK import new enroll key.
 - On next boot MOK Management was launched, you need to choose "Enroll MOK"

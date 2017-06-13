@@ -27,18 +27,22 @@ myver="0.5.7"
 cacert_config="/etc/akmods/cacert.config"
 keyname="$(hostname)"-"$(od -vAn -N4 -tu4 < /dev/urandom | awk '{print $1}')"
 
+echo "Update cacert_config..."
+sed -i "s#\(O = \).*#\1$(hostname)#" $cacert_config
+sed -i "s#\(CN = \).*#\1$keyname#" $cacert_config
+sed -i "s#\(emailAddress = \).*#\1akmods@$(hostname)#" $cacert_config
+
 echo "Generate new keypair..."
+newgrp akmods
+umask 077
 openssl req -x509 -new -nodes -utf8 -sha256 -days 3650 -batch \
  -config $cacert_config -outform DER \
  -out /etc/akmods/keys/$keyname.der \
  -keyout /etc/akmods/keys/$keyname.priv
+exit
 
-# Ensure keyfile have rights permissions
-chmod 640 /etc/akmods/keys/$keyname.der /etc/akmods/keys/$keyname.priv
-chown root:akmods /etc/akmods/keys/$keyname.der /etc/akmods/keys/$keyname.priv
-
-# Need update akmods-signkeypair.conf
-sed -i "s#\(PUBLIC_KEY=\).*#\1/etc/akmods/keys/$keyname.der#" /etc/akmods/sign-keypair.conf
-sed -i "s#\(PRIVATE_KEY=\).*#\1/etc/akmods/keys/$keyname.priv#" /etc/akmods/sign-keypair.conf
+# Update symlink for use current keypair
+ln -sf /etc/akmods/keys/$keyname.der /etc/akmods/keys/public_key.der
+ln -sf /etc/akmods/keys/$keyname.priv /etc/akmods/keys/private_key.priv
 
 exit 0
