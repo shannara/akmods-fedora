@@ -33,13 +33,16 @@ sed -i "s#\(CN = \).*#\1$keyname#" $cacert_config
 sed -i "s#\(emailAddress = \).*#\1akmods@$(hostname)#" $cacert_config
 
 echo "Generate new keypair..."
-newgrp akmods
-umask 077
+newgrp akmods << genkey
+umask 037
 openssl req -x509 -new -nodes -utf8 -sha256 -days 3650 -batch \
  -config $cacert_config -outform DER \
  -out /etc/akmods/keys/$keyname.der \
  -keyout /etc/akmods/keys/$keyname.priv
-exit
+genkey
+
+# Ensure that akmods group can read keys
+chmod g+r /etc/akmods/keys/$keyname.*
 
 # Update symlink for use current keypair
 ln -sf /etc/akmods/keys/$keyname.der /etc/akmods/keys/public_key.der

@@ -133,6 +133,7 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 %{_sbindir}/akmods-genca
 %attr(-,root,akmods) %{_sysconfdir}/akmods
 %attr(750,root,akmods) %{_sysconfdir}/akmods/keys
+%attr(640,root,akmods) %{_sysconfdir}/akmods/sign-keypair.conf
 %{_sysconfdir}/kernel/postinst.d/akmodsposttrans
 %{_unitdir}/akmods.service
 %{_unitdir}/akmods-shutdown.service
@@ -143,7 +144,7 @@ useradd -r -g akmods -d /var/cache/akmods/ -s /sbin/nologin \
 
 
 %changelog
-* Wed May 24 2017 Stanislas Leduc <stanislas.leduc@balinor.net> - 0.5.7-1
+* Tue Sep 26 2017 Stanislas Leduc <stanislas.leduc@balinor.net> - 0.5.7-1
 - Add local akmods CA signing key for sign modules to work with Secure Boot.
 
 * Thu May  4 2017 Hans de Goede <hdegoede@redhat.com> - 0.5.6-7
